@@ -27,6 +27,33 @@
     <title>React App</title>
   </head>
   <body>
+    <script>
+      /*
+       * 리액트 코드 런타임에서 실행시킬 경우 서버사이드 렌더링이 실행되었을 경우, 자바스크립트 파일이 파싱 된 후 실행됨
+       * 플리커 현상 발생 가능성 있음
+       */
+
+      window.localStorage.setItem("theme", "dark"); // 시스템 상의 모드를 새로고침후에도 저장하고 싶을때
+
+      const isDarkMode = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+
+      if (isDarkMode) {
+        document.documentElement.classList.add("theme-dark");
+      }
+
+      const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
+
+      // 다크모드 토글처럼, 시스템 상에서의 모드 변경시에도 가능하도록!
+      mediaQueryList.addEventListener("change", (e) => {
+        if (e.matches) {
+          document.documentElement.classList.add("theme-dark");
+        } else {
+          document.documentElement.classList.remove("theme-dark");
+        }
+      });
+    </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!--
