@@ -34,8 +34,8 @@ const generateThemeCssVariables = () => {
             )
             .join("\n"); // array들을 줄바꿈해서 합쳐줌
 
-            // 자동 생성 파일이기 때문에 주석으로 표시해둠
-          cssString.push(`/*자동으로 생성되는 파일입니다! 변경 금지*/ \n ${selector} {\n${cssVariables}\n}`);
+          // 자동 생성 파일이기 때문에 주석으로 표시해둠
+          return cssString.push(`/*자동으로 생성되는 파일입니다! 변경 금지*/ \n ${selector} {\n${cssVariables}\n}`);
         }
 
         if (colorKey === "dark") {
@@ -54,19 +54,68 @@ const generateThemeCssVariables = () => {
             )
             .join("\n"); // array들을 줄바꿈해서 합쳐줌
 
-            // 자동 생성 파일이기 때문에 주석으로 표시해둠
-          cssString.push(`/*자동으로 생성되는 파일입니다! 변경 금지*/ \n ${selector} {\n${cssVariables}\n}`);
+          // 자동 생성 파일이기 때문에 주석으로 표시해둠
+          return cssString.push(`/*자동으로 생성되는 파일입니다! 변경 금지*/ \n ${selector} {\n${cssVariables}\n}`);
         }
       });
+      return
     }
+
+    const selector = ":root";
+
+    const cssVariables = Object.entries(value)
+      .map(([mainKey, mainValue]) =>
+        Object.entries(mainValue)
+          .map(
+            ([subKey, subValue]) =>
+              `--${toCssCasting(mainKey)}-${toCssCasting(
+                subKey
+              )}: ${subValue};`
+          )
+          .join("\n")
+      )
+      .join("\n"); // array들을 줄바꿈해서 합쳐줌
+
+    // 자동 생성 파일이기 때문에 주석으로 표시해둠
+    return cssString.push(`/*자동으로 생성되는 파일입니다! 변경 금지*/ \n ${selector} {\n${cssVariables}\n}`);
   });
   return cssString;
 };
 
+const generateThemeCssClasses = () => {
+  const cssString = [];
+
+  Object.entries(theme.classes).forEach(([, value]) => {
+    const cssClasses = Object.entries(value)
+      .map(([mainKey, mainValue]) => (
+        Object.entries(mainValue)
+          .map(([subKey, subValue]) => {
+
+            const className = `.${toCssCasting(mainKey)}${toCssCasting(subKey)}`;
+
+            const styleProperties = Object.entries(subValue).map(([styleKey, styleValue]) => (
+              `${toCssCasting(styleKey)}: ${styleValue};`
+            )).join('\n');
+
+            return `${className} {\n${styleProperties}\n}`;
+          }).join('\n')
+      )).join('\n');
+
+    cssString.push(cssClasses);
+  })
+
+  return cssString;
+}
+
+
+
+
 const generateThemeCss = () => {
   const variables = generateThemeCssVariables();
+  const classes = generateThemeCssClasses()
 
-  fs.writeFileSync("dist/themes.css", [...variables].join("\n")); // dist 파일의 themes.css는 자동으로 만들어지는 파일!!
+  // variables은 root고 class는 그 위에 생성되어야 함
+  fs.writeFileSync("dist/themes.css", [...variables, ...classes].join("\n")); // dist 파일의 themes.css는 자동으로 만들어지는 파일!!
 };
 
 generateThemeCss();
