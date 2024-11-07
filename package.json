@@ -1,7 +1,12 @@
 {
   "name": "yummy",
   "version": "0.0.0",
+  "workspaces": [
+    "packages/**/*",
+    "services/**/*"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  }
+  },
+  "packageManager": "yarn@4.5.1"
 }
